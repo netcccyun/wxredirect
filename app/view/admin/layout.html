@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>{block name="title"}标题{/block}</title>
+  <link href="//cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+  <link href="../static/css/bootstrap-table.css" rel="stylesheet" />
+  <script src="//cdn.staticfile.org/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="//cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdn.staticfile.org/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdn.staticfile.org/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <nav class="navbar navbar-fixed-top navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+          aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">导航按钮</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="./index">微信公众号多域名回调系统</a>
+      </div><!-- /.navbar-header -->
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="{:checkIfActive('index')}">
+            <a href="./index"><i class="fa fa-home fa-fw"></i> 后台首页</a>
+          </li>
+          <li class="{:checkIfActive('domain')}">
+            <a href="./domain"><i class="fa fa-globe fa-fw"></i> 回调域名管理</a>
+          </li>
+          <li class="{:checkIfActive('record')}">
+            <a href="./record"><i class="fa fa-list fa-fw"></i> 微信登录记录</a>
+          </li>
+          <li class="{:checkIfActive('wxtoken')}">
+            <a href="./wxtoken"><i class="fa fa-key fa-fw"></i> 微信Token管理</a>
+          </li>
+          <li class="{:checkIfActive('set')}">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog fa-fw"></i> 管理员设置<b
+                class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="./set"><i class="fa fa-lock fa-fw"></i> 修改密码</a></li>
+              <li><a href="./logout" onclick="return confirm('确定退出登录吗？')"><i class="fa fa-power-off fa-fw"></i> 退出登录</a></li>
+            </ul>
+          </li>
+          <li>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container -->
+  </nav><!-- /.navbar -->
+  {block name="main"}主内容{/block}
+</body>
+</html>

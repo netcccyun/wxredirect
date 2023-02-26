@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>微信公众号多域名回调系统 - 安装程序</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <style>
+        body {
+            background: #f1f6fd;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body, input, button {
+            font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            font-size: 14px;
+            color: #7E96B3;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        a {
+            color: #4e73df;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: normal;
+            color: #3C5675;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        form {
+            margin-top: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group .form-field:first-child input {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .form-group .form-field:last-child input {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .form-field input {
+            background: #fff;
+            margin: 0 0 2px;
+            border: 2px solid transparent;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            width: 100%;
+            padding: 15px 15px 15px 180px;
+            box-sizing: border-box;
+        }
+
+        .form-field input:focus {
+            border-color: #4e73df;
+            background: #fff;
+            color: #444;
+            outline: none;
+        }
+
+        .form-field label {
+            float: left;
+            width: 160px;
+            text-align: right;
+            margin-right: -160px;
+            position: relative;
+            margin-top: 15px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        button, .btn {
+            background: #3C5675;
+            color: #fff;
+            border: 0;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 15px 30px;
+            -webkit-appearance: none;
+        }
+
+        button[disabled] {
+            opacity: 0.5;
+        }
+
+        .form-buttons {
+            height: 52px;
+            line-height: 52px;
+        }
+
+        .form-buttons .btn {
+            margin-right: 5px;
+        }
+
+        #error, .error, #success, .success, #warmtips, .warmtips {
+            background: #D83E3E;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        #success {
+            background: #3C5675;
+        }
+
+        #error a, .error a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        #warmtips {
+            background: #fff;
+            font-size: 14px;
+            color: #3C5675;
+            border: 2px solid #4e73df;
+            text-align: left;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>
+        <svg t="1666231711309" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1390" width="20%" height="100%"><path d="M499.057025 347.95532c27.691946 0 45.751911-18.661964 45.751911-45.751911 0-27.089947-18.661964-45.751911-45.751911-45.751911-26.487948 0-54.781893 17.457966-54.781893 45.751911C444.275132 329.895356 472.569077 347.95532 499.057025 347.95532z" p-id="1391" fill="#07c160"></path><path d="M299.795414 301.601411c0-27.089947-18.661964-45.751911-45.751911-45.751911-26.487948 0-54.781893 17.457966-54.781893 45.751911 0 28.293945 28.293945 45.751911 54.781893 45.751911C281.73545 347.95532 299.795414 329.293357 299.795414 301.601411z" p-id="1392" fill="#07c160"></path><path d="M1024 625.476778c0-67.423868-30.099941-132.439741-84.279835-183.007643-53.577895-49.965902-125.215755-80.667842-201.067607-87.28983 0-1.203998 0-2.407995 0-3.611993-31.905938-148.091711-190.833627-260.063492-370.229277-260.063492C164.947678 91.503821 0 232.973545 0 406.951205 0 499.659024 46.955908 583.938859 136.653733 649.556731l-30.70194 92.707819c-2.407995 7.223986 0 14.447972 5.417989 19.263962 5.417989 4.815991 13.845973 5.417989 19.865961 2.407995l116.787772-58.393886 13.845973 3.009994 0.601999 0c36.119929 7.223986 67.423868 13.845973 105.951793 13.845973 7.223986 0 34.915932-2.407995 43.945914-6.621987 44.547913 108.359788 163.74368 181.201646 297.387419 181.201646 33.711934 0 68.025867-7.825985 102.3398-16.253968l89.697825 48.761905c2.407995 1.203998 5.417989 2.407995 8.427984 2.407995 4.213992 0 8.427984-1.203998 11.437978-4.213992 6.019988-4.815991 7.825985-12.039976 6.019988-19.263962l-22.875955-75.249853C981.258083 772.364491 1024 698.318636 1024 625.476778zM864.470312 803.66843c-6.019988 4.213992-8.427984 12.039976-6.019988 18.661964l12.641975 42.741917-54.179894-29.497942c-2.407995-1.203998-5.417989-2.407995-8.427984-2.407995-1.203998 0-3.009994 0-4.213992 0.601999-31.303939 7.825985-63.811875 16.253968-95.717813 16.253968-146.285714 0-265.481481-100.533804-265.481481-223.943563 0-123.409759 119.195767-223.943563 265.481481-223.943563 143.877719 0 264.879483 102.3398 264.879483 223.943563C974.034098 687.482657 935.506173 750.692534 864.470312 803.66843zM181.803645 640.526749c2.407995-7.223986 0-15.049971-6.621987-19.865961C90.901822 561.664903 48.159906 490.027043 48.159906 407.553204 48.159906 258.859494 191.435626 137.857731 367.821282 137.857731c154.111699 0 291.96943 93.911817 322.069371 218.525573-164.345679 3.611993-297.387419 120.399765-297.387419 261.869489 0 18.661964 2.407995 37.925926 7.825985 57.189888-0.601999 0-1.805996 0-2.407995 0-9.631981 0.601999-19.865961 1.203998-30.099941 1.203998-34.313933 0-63.811875-6.019988-95.717813-12.641975l-19.263962-3.611993c-3.611993-0.601999-7.825985 0-11.437978 1.203998l-80.065844 40.333921L181.803645 640.526749z" p-id="1393" fill="#07c160"></path><path d="M612.834803 509.893004c-18.661964 0-37.323927 18.661964-37.323927 37.323927 0 18.661964 18.661964 37.323927 37.323927 37.323927 28.293945 0 45.751911-19.263962 45.751911-37.323927C658.586714 529.156966 641.128748 509.893004 612.834803 509.893004z" p-id="1394" fill="#07c160"></path><path d="M804.872428 509.893004c-18.661964 0-36.721928 18.661964-36.721928 37.323927 0 18.661964 18.059965 37.323927 36.721928 37.323927 28.293945 0 45.751911-19.263962 45.751911-37.323927C850.624339 529.156966 833.166373 509.893004 804.872428 509.893004z" p-id="1395" fill="#07c160"></path></svg>
+        </svg>
+    </h1>
+    <h2>微信公众号多域名回调系统 - 安装程序</h2>
+    <div>
+
+        <form method="post">
+            <div id="error" style="display:none"></div>
+            <div id="success" style="display:none"></div>
+
+            <div class="form-group">
+                <div class="form-field">
+                    <label>MySQL 数据库地址</label>
+                    <input type="text" name="mysql_host" value="localhost" required="">
+                </div>
+
+                <div class="form-field">
+                    <label>MySQL 数据库端口</label>
+                    <input type="number" name="mysql_port" value="3306">
+                </div>
+
+                <div class="form-field">
+                    <label>MySQL 用户名</label>
+                    <input type="text" name="mysql_user" value="" required="">
+                </div>
+
+                <div class="form-field">
+                    <label>MySQL 密码</label>
+                    <input type="text" name="mysql_pwd" value="" required="">
+                </div>
+
+                <div class="form-field">
+                    <label>MySQL 数据库名</label>
+                    <input type="text" name="mysql_name" value="" required="">
+                </div>
+
+                <div class="form-field">
+                    <label>MySQL 数据表前缀</label>
+                    <input type="text" name="mysql_prefix" value="wechat_">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-field">
+                    <label>管理员用户名</label>
+                    <input type="text" name="admin_username" value="admin" required=""/>
+                </div>
+
+                <div class="form-field">
+                    <label>管理员密码</label>
+                    <input type="text" name="admin_password" value="123456" required="">
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <!--@formatter:off-->
+                <button type="submit" >点击安装</button>
+                <!--@formatter:on-->
+            </div>
+        </form>
+    </div>
+</div>
+<script src="//cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
+<script>
+    $(function () {
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            var form = this;
+            var $error = $("#error");
+            var $success = $("#success");
+            var $button = $(this).find('button')
+                .text("安装中...")
+                .prop('disabled', true);
+            $.ajax({
+                url: "",
+                type: "POST",
+                dataType: "json",
+                data: $(this).serialize(),
+                success: function (ret) {
+                    if (ret.code == 1) {
+                        $error.hide();
+                        $(".form-group", form).remove();
+                        $button.remove();
+                        $("#success").text(ret.msg).show();
+                        $("#warmtips").show();
+
+                        $buttons = $(".form-buttons", form);
+                        $('<a class="btn" href="/admin" style="background:#4e73df">进入后台</a>').appendTo($buttons);
+
+                    } else {
+                        $error.show().text(ret.msg);
+                        $button.prop('disabled', false).text("点击安装");
+                        $("html,body").animate({
+                            scrollTop: 0
+                        }, 500);
+                    }
+                },
+                error: function (xhr) {
+                    $error.show().text(xhr.responseText);
+                    $button.prop('disabled', false).text("点击安装");
+                    $("html,body").animate({
+                        scrollTop: 0
+                    }, 500);
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

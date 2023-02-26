@@ -1,0 +1,85 @@
+{extend name="admin/layout" /}
+{block name="title"}微信登录记录{/block}
+{block name="main"}
+<style>
+</style>
+<div class="container" style="padding-top:70px;">
+	<div class="col-xs-12 center-block" style="float: none;">
+
+<div id="searchToolbar">
+<form onsubmit="return searchSubmit()" method="GET" class="form-inline">
+	<input type="hidden" name="did">
+  <div class="form-group">
+    <label>搜索</label>
+	<input type="text" class="form-control" name="domain" placeholder="回调域名">
+  </div>
+  <div class="form-group">
+	<input type="text" class="form-control" name="appid" placeholder="微信APPID">
+  </div>
+  <div class="form-group">
+	<button class="btn btn-primary" type="submit"><i class="fa fa-search"></i> 搜索</button>&nbsp;
+	<a href="javascript:searchClear()" class="btn btn-default"><i class="fa fa-repeat"></i> 重置</a>&nbsp;
+  </div>
+</form>
+</div>
+
+      <table id="listTable">
+	  </table>
+	</div>
+  </div>
+<script src="//cdn.staticfile.org/layer/3.1.1/layer.js"></script>
+<script src="//cdn.staticfile.org/bootstrap-table/1.20.2/bootstrap-table.min.js"></script>
+<script src="//cdn.staticfile.org/bootstrap-table/1.20.2/extensions/page-jump-to/bootstrap-table-page-jump-to.min.js"></script>
+<script src="../static/js/custom.js"></script>
+<script>
+
+$(document).ready(function(){
+	updateToolbar();
+	const defaultPageSize = 15;
+	const pageNumber = typeof window.$_GET['pageNumber'] != 'undefined' ? parseInt(window.$_GET['pageNumber']) : 1;
+	const pageSize = typeof window.$_GET['pageSize'] != 'undefined' ? parseInt(window.$_GET['pageSize']) : defaultPageSize;
+
+	$("#listTable").bootstrapTable({
+		url: './record_data',
+		pageNumber: pageNumber,
+		pageSize: pageSize,
+		classes: 'table table-striped table-hover table-bottom-border',
+		columns: [
+			{
+				field: 'id',
+				title: 'ID',
+				formatter: function(value, row, index) {
+					return '<b>'+value+'</b>';
+				}
+			},
+			{
+				field: 'domain',
+				title: '回调域名'
+			},
+			{
+				field: 'type',
+				title: '登录类型',
+				formatter: function(value, row, index) {
+					return value==1 ? '开放平台': '公众号';
+				}
+			},
+			{
+				field: 'appid',
+				title: '微信APPID'
+			},
+			{
+				field: 'ip',
+				title: '登录IP',
+				formatter: function(value, row, index) {
+					return '<a href="https://m.ip138.com/iplookup.asp?ip='+value+'" target="_blank" rel="noreferrer">'+value+'</a>';
+				}
+			},
+			{
+				field: 'addtime',
+				title: '记录时间'
+			},
+		],
+	})
+})
+</script>
+{/block}
