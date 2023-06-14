@@ -335,3 +335,33 @@ function refresh_wx_access_token($id, $force = false){
 		throw new Exception($e->getMessage());
 	}
 }
+
+function refresh_qywx_access_token($id, $force = false){
+	Db::startTrans();
+	$access_token = null;
+	try{
+		$row = Db::name('token')->where('id', $id)->lock(true)->find();
+		if(!$row) throw new Exception('记录不存在');
+		if($row['access_token'] && strtotime($row['expiretime']) - 200 >= time() && !$force){
+			Db::rollback();
+			return [$row['access_token'], strtotime($row['expiretime']) - time()];
+		}
+		$url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=".$row['appid']."&corpsecret=".$row['appsecret'];
+		$output = get_curl($url);
+		$res = json_decode($output, true);
+		if (isset($res['access_token'])) {
+			$access_token = $res['access_token'];
+			$expire_time = time() + $res['expires_in'];
+			Db::name('token')->where('id', $id)->update(['access_token'=>$res['access_token'], 'updatetime'=>date("Y-m-d H:i:s"), 'expiretime'=>date("Y-m-d H:i:s", $expire_time)]);
+		}elseif(isset($res['errmsg'])){
+			throw new Exception('AccessToken获取失败：'.$res['errmsg']);
+		}else{
+			throw new Exception('AccessToken获取失败');
+		}
+		Db::commit();
+		return [$access_token, $res['expires_in']];
+	} catch (\Exception $e) {
+		Db::rollback();
+		throw new Exception($e->getMessage());
+	}
+}

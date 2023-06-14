@@ -232,7 +232,11 @@ class Admin extends BaseController
         $row = Db::name('token')->where('id', $id)->find();
         if(!$row) return json(['code'=>-1, 'msg'=>'记录不存在']);
         try{
-            refresh_wx_access_token($row['id'], true);
+            if($row['type'] == 3){
+                refresh_qywx_access_token($row['id'], true);
+            }else{
+                refresh_wx_access_token($row['id'], true);
+            }
             return json(['code'=>0, 'msg'=>'接口连接测试成功！']);
         }catch(\Exception $e){
             return json(['code'=>-1, 'msg'=>$e->getMessage()]);

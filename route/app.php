@@ -13,8 +13,11 @@ use think\facade\Route;
 Route::get('/', 'index/index');
 Route::get('/connect/oauth2/authorize', 'index/connect');
 Route::get('/connect/qrconnect', 'index/qrconnect');
+Route::get('/alipayoauth', 'index/alipayoauth');
 Route::get('/token', 'index/token');
+Route::get('/qytoken', 'index/qytoken');
 Route::get('/return', 'index/return');
+Route::get('/alipayreturn', 'index/alipayreturn');
 
 Route::any('/install', 'install/index');
 

@@ -38,28 +38,28 @@
     <p>微信公众号后台默认只能授权2个网页域名，用本系统突破这个限制，用同一个公众号对接无限多个网站。网站后台支持回调域名白名单的管理，以及登录记录的查看。</p>
     <p>此功能和微信Token管理没任何关系，使用此功能无需在微信Token管理添加记录！</p>
     <h3>使用方法：</h3>
-    <p>支持微信公众号与微信开放平台2种登录的回调。</p>
+    <p>将业务代码中的<code>https://open.weixin.qq.com</code>替换成<code>{$siteurl}</code></p>
+    <p>支持微信公众号与微信开放平台2种登录的回调，替换后的地址如下所示。</p>
     <p>微信公众号网页授权跳转链接：<code>{$siteurl}/connect/oauth2/authorize?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect</code>
     </p>
     <p>微信开放平台登录跳转链接：<code>{$siteurl}/connect/qrconnect?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect</code>
     </p>
-    <p>可以看出URL路径和参数与官方的<a
-            href="https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html" target="_blank" rel="noopener noreferrer">微信公众号网页授权接口</a>、<a
-            href="https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html" target="_blank" rel="noopener noreferrer">微信开放平台登录接口</a>完全一样，只是把官方接口的<code>https://open.weixin.qq.com</code>替换成了<code>{$siteurl}</code>。因此对接也很简单，只需在业务代码里面替换域名即可！
-    </p>
-    <p><strong>注：所传参数REDIRECT_URI里面的域名，需要先在后台回调域名管理里面添加。微信公众号/开放平台后台只需要授权本站的域名。</strong></p>
+    <p><strong>注：业务系统的域名，需要先在本站回调域名管理里面添加。微信公众号/开放平台后台只需要授权本站的域名。</strong></p>
     <h1 id="wxtoken">微信access_token获取功能</h2>
     <h3>功能简介：</h3>
     <p>可让当前站点作为中控服务器统一获取和刷新access_token，其他业务逻辑站点所使用的access_token均调用当前站点获取，这样可避免各自刷新造成冲突，导致access_token覆盖而影响业务。</p>
     <h3>使用方法：</h3>
-    <p>先在后台微信Token管理添加公众号/小程序/开放平台账号信息。</p>
-    <p>获取access_token接口调用说明</p>
-    <p>GET请求URL：<code>{$siteurl}/token?appid=APPID&amp;secret=APPSECRET</code></p>
-    <p>具体参数说明和返回内容格式与<a
-            href="https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html" target="_blank" rel="noopener noreferrer">微信官方获取Access
-            token接口</a>完全一样，只是将<code>https://api.weixin.qq.com/cgi-bin/token</code>替换成了<code>{$siteurl}/token</code>，只需在业务代码里面替换接口地址即可！</p>
+    <p>先在后台微信Token管理添加公众号/小程序/开放平台/企业微信账号信息。</p>
+    <p>公众号/小程序/开放平台是将业务代码中的<code>https://api.weixin.qq.com/cgi-bin/token</code>替换成<code>{$siteurl}/token</code></p>
+    <p>企业微信是将业务代码中的<code>https://qyapi.weixin.qq.com/cgi-bin/gettoken</code>替换成<code>{$siteurl}/qytoken</code></p>
     <p><strong>注：本站会对access_token进行缓存，如果在其他地方调用了官方获取接口，导致本站的access_token失效，此时可以在后台微信Token管理列表点&quot;测试&quot;按钮，强制刷新access_token缓存</strong>。
     </p>
+    <h1 id="alipayoauth">支付宝开放平台多域名回调功能</h2>
+        <h3>功能简介：</h3>
+        <p>每个支付宝开发平台应用只能配置1个授权回调域名，用本系统突破这个限制，可同时用多个网站对接1个应用。</p>
+        <h3>使用方法：</h3>
+        <p>将业务代码中的<code>https://openauth.alipay.com/oauth2/publicAppAuthorize.htm</code>替换成<code>{$siteurl}/alipayoauth</code></p>
+        <p><strong>注：业务系统的域名，需要先在本站回调域名管理里面添加。支付宝开发平台应用只需要授权本站的域名。</strong></p>
     <p>&nbsp;</p>
 </div>
 </div>
