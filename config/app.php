@@ -30,5 +30,5 @@ return [
     // 显示错误信息
     'show_error_msg'   => false,
 
-    'version' => '1001'
+    'version' => '1002'
 ];
