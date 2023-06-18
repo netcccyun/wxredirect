@@ -39,7 +39,7 @@
     <p>此功能和微信Token管理没任何关系，使用此功能无需在微信Token管理添加记录！</p>
     <h3>使用方法：</h3>
     <p>将业务代码中的<code>https://open.weixin.qq.com</code>替换成<code>{$siteurl}</code></p>
-    <p>支持微信公众号与微信开放平台2种登录的回调，替换后的地址如下所示。</p>
+    <p>支持微信公众号、微信开放平台、企业微信3种登录的回调，替换后的地址如下所示。</p>
     <p>微信公众号网页授权跳转链接：<code>{$siteurl}/connect/oauth2/authorize?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect</code>
     </p>
     <p>微信开放平台登录跳转链接：<code>{$siteurl}/connect/qrconnect?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect</code>
