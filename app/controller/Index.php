@@ -2,6 +2,7 @@
 namespace app\controller;
 
 use app\BaseController;
+use app\lib\WechatServer;
 use Exception;
 use think\facade\Db;
 use think\facade\View;
@@ -48,6 +49,7 @@ class Index extends BaseController
             "scope" => $scope,
             "state" => $state
         ];
+        if(input('?get.agentid')) $param['agentid'] = input('get.agentid');
         $url = $apiurl.'?'.http_build_query($param).'#wechat_redirect';
         return redirect($url);
     }
@@ -231,6 +233,34 @@ class Index extends BaseController
                 return json(['errcode'=>40004, 'errmsg'=>$e->getMessage()]);
             }
         }
+    }
+
+    //微信消息事件转发
+    public function wxserver(){
+        $id = input('param.id/d');
+        if(!$id) exit('param error');
+        $group = Db::name('servergroup')->where('id', $id)->find();
+        if(!$group) exit('服务器组不存在');
+        $items = Db::name('serveritem')->where('gid', $id)->where('status', 1)->select();
+
+        $resData = '';
+        $server = new WechatServer($group['token'], $group['enckey']);
+        $xml = $group['type'] == 1 ? $server->getWeWorkRequest() : $server->getWechatRequest();
+        
+        if(count($items) == 0) exit('组内服务器数量为0');
+
+        foreach($items as $row){
+            $res = $server->sendRequest($row['url'], $xml);
+            if($res[0] === true){
+                if(empty($resData)) $resData = $res[1];
+                Db::name('serveritem')->where('id', $row['id'])->update(['enable' => 1]);
+                if($group['mode'] == 1) break;
+            }else{
+                Db::name('serveritem')->where('id', $row['id'])->update(['enable' => 2]);
+            }
+        }
+        Db::name('servergroup')->where('id', $id)->inc('count')->update(['usetime' => date("Y-m-d H:i:s")]);
+        exit($resData);
     }
 
     private function error($msg){

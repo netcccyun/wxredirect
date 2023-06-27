@@ -1,5 +1,5 @@
 {extend name="admin/layout" /}
-{block name="title"}微信Token管理{/block}
+{block name="title"}转发服务器组管理{/block}
 {block name="main"}
 <div class="modal" id="modal-store" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
 	<div class="modal-dialog">
@@ -8,39 +8,55 @@
 				<button type="button" class="close" data-dismiss="modal"><span
 							aria-hidden="true">&times;</span><span
 							class="sr-only">Close</span></button>
-				<h4 class="modal-title" id="modal-title">微信Token修改/添加</h4>
+				<h4 class="modal-title" id="modal-title">微信转发服务器组修改/添加</h4>
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal" id="form-store">
 					<input type="hidden" name="action" id="action"/>
 					<input type="hidden" name="id" id="id"/>
 					<div class="form-group">
-						<label class="col-sm-3 control-label">类别</label>
-						<div class="col-sm-9">
-							<select name="type" id="type" class="form-control">
-								<option value="0">微信公众号</option>
-								<option value="1">微信小程序</option>
-								<option value="2">微信开放平台</option>
-								<option value="3">企业微信</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label no-padding-right">名称</label>
+						<label class="col-sm-3 control-label no-padding-right">服务器组名称</label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" name="name" id="name" placeholder="仅用于显示，不能重复">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label no-padding-right">APPID</label>
+						<label class="col-sm-3 control-label">平台类型</label>
 						<div class="col-sm-9">
-							<input type="text" class="form-control" name="appid" id="appid" placeholder="">
+							<select name="type" id="type" class="form-control" onchange="changeMode()">
+								<option value="0">微信公众平台</option>
+								<option value="1">企业微信</option>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label no-padding-right">APPSECRET</label>
+						<label class="col-sm-3 control-label">转发类型</label>
 						<div class="col-sm-9">
-							<input type="text" class="form-control" name="appsecret" id="appsecret" placeholder="">
+							<select name="mode" id="mode" class="form-control">
+								<option value="0">全部转发（组内服务器全部转发）</option>
+								<option value="1">顺序转发（组内服务器按顺序依次转发，有正常返回的则中止）</option>
+							</select>
+						</div>
+					</div>
+					<div id="form-edit" style="display: none;">
+						<div class="alert alert-warning col-sm-offset-3 col-sm-9">以下信息填写到微信公众平台[服务器配置]</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right">服务器URL</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" name="server_url" id="server_url" readonly="">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label no-padding-right">Token</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" name="server_token" id="server_token" placeholder="最长32位，需与微信后台设置一致" autocomplete="off">
+							</div>
+						</div>
+						<div class="form-group" id="enckey_form" style="display: none;">
+							<label class="col-sm-3 control-label no-padding-right">EncodingAESKey</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" name="server_enckey" id="server_enckey" placeholder="需与微信后台设置一致" autocomplete="off">
+							</div>
 						</div>
 					</div>
 				</form>
@@ -57,12 +73,12 @@
 <form onsubmit="return searchSubmit()" method="GET" class="form-inline" id="searchToolbar">
   <div class="form-group">
 	<label>搜索</label>
-    <input type="text" class="form-control" name="kw" placeholder="名称或APPID">
+    <input type="text" class="form-control" name="kw" placeholder="服务器组名称">
   </div>
   <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
   <a href="javascript:searchClear()" class="btn btn-default" title="刷新域名列表"><i class="fa fa-refresh"></i> 刷新</a>
   <a href="javascript:addframe()" class="btn btn-success"><i class="fa fa-plus"></i> 添加</a>
-  <a href="./doc#wxtoken" class="btn btn-default" target="_blank"><i class="fa fa-info-circle"></i> 帮助</a>
+  <a href="./doc#wxserver" class="btn btn-default" target="_blank"><i class="fa fa-info-circle"></i> 帮助</a>
 </form>
 
       <table id="listTable">
@@ -81,7 +97,7 @@ $(document).ready(function(){
 	const pageSize = typeof window.$_GET['pageSize'] != 'undefined' ? parseInt(window.$_GET['pageSize']) : defaultPageSize;
 
 	$("#listTable").bootstrapTable({
-		url: './wxtoken_data',
+		url: './servergroup_data',
 		pageNumber: pageNumber,
 		pageSize: pageSize,
 		classes: 'table table-striped table-hover table-bordered',
@@ -91,71 +107,93 @@ $(document).ready(function(){
 				title: 'ID'
 			},
 			{
+				field: 'name',
+				title: '服务器组名称'
+			},
+			{
 				field: 'type',
-				title: '类别',
+				title: '平台类型',
 				formatter: function(value, row, index) {
-					switch(value){
-						case 0: return '微信公众号';break;
-						case 1: return '微信小程序';break;
-						case 2: return '微信开放平台';break;
-						case 3: return '企业微信';break;
+					if(value == 1){
+						return '企业微信';
+					}else{
+						return '微信公众平台';
 					}
 				}
 			},
-			{
-				field: 'name',
-				title: '名称'
-			},
             {
-				field: 'appid',
-				title: 'APPID'
+				field: 'mode',
+				title: '转发类型',
+				formatter: function(value, row, index) {
+					if(value == 1){
+						return '顺序转发';
+					}else{
+						return '全部转发';
+					}
+				}
 			},
 			{
 				field: 'addtime',
 				title: '添加时间'
 			},
 			{
-				field: 'updatetime',
-				title: '最后更新时间'
+				field: 'usetime',
+				title: '最后使用时间'
+			},
+			{
+				field: 'count',
+				title: '累计使用次数'
 			},
 			{
 				field: '',
 				title: '操作',
 				formatter: function(value, row, index) {
-					var html = '<a href="javascript:editframe('+row.id+')" class="btn btn-info btn-xs">编辑</a> <a href="javascript:delItem('+row.id+')" class="btn btn-danger btn-xs">删除</a> <a href="javascript:textwxtoken('+row.id+')" class="btn btn-default btn-xs" title="同时强制刷新Token">测试</a>';
+					var html = '<a href="javascript:editframe('+row.id+')" class="btn btn-info btn-xs">修改信息</a> <a href="javascript:groupitem('+row.id+', \''+row.name+'\')" class="btn btn-warning btn-xs">组内服务器('+row.itemnum+')</a> <a href="javascript:delItem('+row.id+')" class="btn btn-danger btn-xs">删除</a>';
 					return html;
 				}
 			},
 		],
 	})
 })
+function changeMode(){
+	var mode = parseInt($("#type").val());
+	if(mode==1){
+		$("#enckey_form").show();
+	}else{
+		$("#enckey_form").hide();
+	}
+}
 function addframe(){
 	$("#modal-store").modal('show');
-	$("#modal-title").html("新增微信Token");
+	$("#modal-title").html("新增微信转发服务器组");
 	$("#action").val("add");
 	$("#id").val('');
 	$("#type").val(0);
+	$("#mode").val(0);
 	$("#name").val('');
-	$("#appid").val('');
-	$("#appsecret").val('');
+	$("#form-edit").hide();
 }
 function editframe(id){
 	var ii = layer.load(2);
 	$.ajax({
 		type : 'GET',
-		url : './wxtoken?act=get&id='+id,
+		url : './servergroup?act=get&id='+id,
 		dataType : 'json',
 		success : function(data) {
 			layer.close(ii);
 			if(data.code == 0){
 				$("#modal-store").modal('show');
-				$("#modal-title").html("修改微信Token");
+				$("#modal-title").html("修改微信转发服务器组");
 				$("#action").val("edit");
 				$("#id").val(data.data.id);
 				$("#type").val(data.data.type);
+				$("#mode").val(data.data.mode);
 				$("#name").val(data.data.name);
-				$("#appid").val(data.data.appid);
-				$("#appsecret").val(data.data.appsecret);
+				$("#server_url").val(data.data.url);
+				$("#server_token").val(data.data.token);
+				$("#server_enckey").val(data.data.enckey);
+				$("#form-edit").show();
+				changeMode()
 			}else{
 				layer.alert(data.msg, {icon: 2})
 			}
@@ -167,13 +205,13 @@ function editframe(id){
 	});
 }
 function save(){
-	if($("#name").val()==''||$("#appid").val()==''||$("#appsecret").val()==''){
-		layer.alert('请确保各项不能为空！');return false;
+	if($("#name").val()==''){
+		layer.alert('名称不能为空！');return false;
 	}
 	var ii = layer.load(2);
 	$.ajax({
 		type : 'POST',
-		url : './wxtoken?act=save',
+		url : './servergroup?act=save',
 		data : $("#form-store").serialize(),
 		dataType : 'json',
 		success : function(data) {
@@ -196,13 +234,13 @@ function save(){
 	});
 }
 function delItem(id) {
-	var confirmobj = layer.confirm('你确实要删除此微信Token吗？', {
+	var confirmobj = layer.confirm('你确实要删除此微信转发服务器组吗？', {
 	  btn: ['确定','取消']
 	}, function(){
 	  var ii = layer.load(2);
 	  $.ajax({
 		type : 'GET',
-		url : './wxtoken?act=del&id='+id,
+		url : './servergroup?act=del&id='+id,
 		dataType : 'json',
 		success : function(data) {
 			layer.close(ii);
@@ -222,24 +260,19 @@ function delItem(id) {
 	  layer.close(confirmobj);
 	});
 }
-function textwxtoken(id) {
-	var ii = layer.load(2);
-	$.ajax({
-		type : 'POST',
-		url : './textwxtoken',
-		data : {id:id},
-		dataType : 'json',
-		success : function(data) {
-			layer.close(ii);
-			if(data.code == 0){
-				layer.alert(data.msg, {icon:1}, function(){ layer.closeAll(); searchSubmit() });
-			}else{
-				layer.alert(data.msg, {icon:2});
-			}
-		},
-		error:function(data){
-			layer.close(ii);
-			layer.msg('服务器错误');
+function groupitem(id, name) {
+	if($(window).width() > 900){
+		var area = ["920px",";max-height:100%;min-height:600px"];
+	}else{
+		var area = ["100%",";max-height:100%;min-height:600px"];
+	}
+	layer.open({
+		type: 2,
+		title: '组内服务器管理 - '+name,
+		area: area,
+		content: './serveritem?gid=' + id,
+		end: function(){
+			searchSubmit();
 		}
 	});
 }

@@ -365,3 +365,36 @@ function refresh_qywx_access_token($id, $force = false){
 		throw new Exception($e->getMessage());
 	}
 }
+
+//转为XML数据
+function array2Xml($data)
+{
+	if (!is_array($data)) {
+		return false;
+	}
+	$xml = '<xml>';
+	foreach ($data as $key => $val) {
+		$xml .= (is_numeric($val) ? "<{$key}>{$val}</{$key}>" : "<{$key}><![CDATA[{$val}]]></{$key}>");
+	}
+	return $xml . '</xml>';
+}
+
+//解析XML数据
+function xml2array($xml)
+{
+	if (!$xml) {
+		return false;
+	}
+	LIBXML_VERSION < 20900 && libxml_disable_entity_loader(true);
+	return json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA), JSON_UNESCAPED_UNICODE), true);
+}
+
+function getRequstStatus($status){
+	if($status == 2){
+		return '<font color="red">响应失败</font>';
+	}elseif($status == 1){
+		return '<font color="green">响应成功</font>';
+	}elseif($status == 0){
+		return '<font color="grey">暂未请求</font>';
+	}
+}

@@ -3,6 +3,7 @@
 namespace app\controller;
 
 use app\BaseController;
+use app\lib\WechatServer;
 use think\facade\Db;
 use think\facade\View;
 use think\facade\Request;
@@ -70,6 +71,12 @@ class Admin extends BaseController
             return json(['code'=>-3]);
         }
 
+        if(config('app.dbversion') && config_get('version') != config('app.dbversion')){
+            $this->db_update();
+            config_set('version', config('app.dbversion'));
+            Cache::clear();
+        }
+
         $tmp = 'version()';
         $mysqlVersion = Db::query("select version()")[0][$tmp];
         $info = [
@@ -83,6 +90,18 @@ class Admin extends BaseController
         View::assign('info', $info);
         View::assign('checkupdate', '//auth.cccyun.cc/app/wechat.php?ver='.config('app.version'));
         return view();
+    }
+
+    private function db_update(){
+        $sqls=file_get_contents(app()->getRootPath().'update.sql');
+        $mysql_prefix = env('database.prefix', 'wechat_');
+        $sqls=explode(';', $sqls);
+        foreach ($sqls as $value) {
+            $value=trim($value);
+            if(empty($value))continue;
+            $value = str_replace('wechat_',$mysql_prefix,$value);
+            Db::execute($value);
+        }
     }
 
     public function domain(){
@@ -241,6 +260,134 @@ class Admin extends BaseController
         }catch(\Exception $e){
             return json(['code'=>-1, 'msg'=>$e->getMessage()]);
         }
+    }
+
+    public function servergroup(){
+        if(request()->isAjax()){
+            $act = input('get.act');
+            if($act == 'get'){
+                $id = input('get.id/d');
+                $row = Db::name('servergroup')->where('id', $id)->find();
+                $row['url'] = request()->root(true) . '/wxserver/id/'.$id;
+                return json(['code'=>0, 'data'=>$row]);
+            }elseif($act == 'del'){
+                $id = input('get.id/d');
+                Db::name('servergroup')->where('id', $id)->delete();
+                Db::name('serveritem')->where('gid', $id)->delete();
+                return json(['code'=>0]);
+            }elseif($act == 'save'){
+                $id = input('post.id/d');
+                $type = input('post.type/d');
+                $mode = input('post.mode/d');
+                $name = input('post.name', null, 'trim');
+                $server_token = input('post.server_token', null, 'trim');
+                $server_enckey = input('post.server_enckey', null, 'trim');
+                if(!$name) return json(['code'=>-1, 'msg'=>'名称不能为空']);
+                if(input('post.action') == 'add'){
+                    if(Db::name('servergroup')->where('name', $name)->find()){
+                        return json(['code'=>-1, 'msg'=>'名称重复']);
+                    }
+                    Db::name('servergroup')->insert([
+                        'type' => $type,
+                        'mode' => $mode,
+                        'name' => $name,
+                        'token' => md5(uniqid(mt_rand(), true) . microtime()),
+                        'addtime' => date("Y-m-d H:i:s")
+                    ]);
+                    return json(['code'=>0, 'msg'=>'添加微信转发服务器组成功！其他信息请点击修改信息查看']);
+                }else{
+                    if(!$server_token) return json(['code'=>-1, 'msg'=>'Token不能为空']);
+                    if(Db::name('servergroup')->where('name', $name)->where('id', '<>', $id)->find()){
+                        return json(['code'=>-1, 'msg'=>'名称重复']);
+                    }
+                    Db::name('servergroup')->where('id', $id)->update([
+                        'type' => $type,
+                        'mode' => $mode,
+                        'name' => $name,
+                        'token' => $server_token,
+                        'enckey' => $type == 1 ? $server_enckey : null,
+                    ]);
+                    return json(['code'=>0, 'msg'=>'修改微信转发服务器组成功！']);
+                }
+            }
+            return json(['code'=>-3]);
+        }
+        return view();
+    }
+
+    public function servergroup_data(){
+        $kw = input('post.kw', null, 'trim');
+        $offset = input('post.offset/d');
+        $limit = input('post.limit/d');
+
+        $select = Db::name('servergroup');
+        if(!empty($kw)){
+            $select->whereLike('name', '%'.$kw.'%');
+        }
+        $total = $select->count();
+        $rows = $select->alias('A')->fieldRaw("A.*,(SELECT COUNT(*) FROM wechat_serveritem WHERE gid=A.id) itemnum")->order('id','desc')->limit($offset, $limit)->select();
+
+        return json(['total'=>$total, 'rows'=>$rows]);
+    }
+
+    public function serveritem(){
+        if(request()->isAjax()){
+            $act = input('get.act');
+            if($act == 'get'){
+                $id = input('get.id/d');
+                $row = Db::name('serveritem')->where('id', $id)->find();
+                return json(['code'=>0, 'data'=>$row]);
+            }elseif($act == 'del'){
+                $id = input('get.id/d');
+                Db::name('serveritem')->where('id', $id)->delete();
+                return json(['code'=>0]);
+            }elseif($act == 'set'){
+                $id = input('post.id/d');
+                $status = input('post.status/d');
+                Db::name('serveritem')->where('id', $id)->update(['status'=>$status]);
+                return json(['code'=>0]);
+            }elseif($act == 'save'){
+                $id = input('post.id/d');
+                $gid = input('post.gid/d');
+                $sort = input('post.sort/d');
+                $server_url = input('post.server_url', null, 'trim');
+                if(!$server_url) return json(['code'=>-1, 'msg'=>'服务器URL不能为空']);
+                if(parse_url($server_url)['host'] == request()->host()) return json(['code'=>-1, 'msg'=>'服务器URL不能是当前站点']);
+                if(input('post.action') == 'add'){
+                    if(Db::name('serveritem')->where('gid', $gid)->where('url', $server_url)->find()){
+                        return json(['code'=>-1, 'msg'=>'服务器URL已存在']);
+                    }
+                    $group = Db::name('servergroup')->where('id', $gid)->find();
+                    $server = new WechatServer($group['token'], $group['enckey']);
+                    if($group['type'] == 0 && !$server->verifyWechatServer($server_url) || $group['type'] == 1 && !$server->verifyWeWorkServer($server_url)){
+                        return json(['code'=>-1, 'msg'=>'服务器Token验证失败']);
+                    }
+                    Db::name('serveritem')->insert([
+                        'gid' => $gid,
+                        'sort' => $sort,
+                        'url' => $server_url,
+                        'status' => 1,
+                        'addtime' => date("Y-m-d H:i:s")
+                    ]);
+                    return json(['code'=>0, 'msg'=>'添加转发服务器成功！']);
+                }else{
+                    if(Db::name('serveritem')->where('gid', $gid)->where('url', $server_url)->where('id', '<>', $id)->find()){
+                        return json(['code'=>-1, 'msg'=>'服务器URL已存在']);
+                    }
+                    Db::name('serveritem')->where('id', $id)->update([
+                        'sort' => $sort,
+                        'url' => $server_url,
+                    ]);
+                    return json(['code'=>0, 'msg'=>'修改转发服务器成功！']);
+                }
+            }
+            return json(['code'=>-3]);
+        }
+        $gid = input('get.gid/d');
+        $rows = Db::name('serveritem')->where('gid', $gid)->order('sort','asc')->select();
+        View::assign('gid', $gid);
+        View::assign('rows', $rows);
+        return view();
     }
 
     public function set(){

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>组内转发服务器管理</title>
+  <link href="//cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+  <script src="//cdn.staticfile.org/modernizr/2.8.3/modernizr.min.js"></script>
+  <script src="//cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdn.staticfile.org/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdn.staticfile.org/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="modal" id="modal-store" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content animated flipInX">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span
+							aria-hidden="true">&times;</span><span
+							class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="modal-title">组内转发服务器修改/添加</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" id="form-store">
+					<input type="hidden" name="action" id="action"/>
+					<input type="hidden" name="id" id="id"/>
+					<input type="hidden" name="gid" id="gid" value="{$gid}"/>
+					<div class="form-group">
+						<label class="col-sm-3 control-label no-padding-right">排序号</label>
+						<div class="col-sm-9">
+							<input type="number" class="form-control" name="sort" id="sort" min="1" value="1" autocomplete="off">
+						</div>
+					</div>
+					<div class="alert alert-warning col-sm-offset-3 col-sm-9">以下信息在业务网站内查看，会将微信消息转发到以下地址</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label no-padding-right">服务器URL</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" name="server_url" id="server_url" autocomplete="off">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" id="store" onclick="save()">保存</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container-fluid">
+<div class="list-group-item">
+	<a href="javascript:addframe()" class="btn btn-success"><i class="fa fa-plus"></i> 添加</a>
+</div>
+  <div class="table-responsive">
+	<table class="table table-striped table-hover table-bordered">
+	  <thead><tr><th>排序号</th><th>服务器URL</th><th>添加时间</th><th>上次转发</th><th>状态</th><th>操作</th></tr></thead>
+	  <tbody>
+{volist name="rows" id="data"}
+<tr><td>{$data.sort}</td><td>{$data.url}</td><td>{$data.addtime}</td><td>{:getRequstStatus($data.enable)}</td><td>{if $data.status==1}<a class="btn btn-xs btn-success" onclick="setStatus({$data.id},0)">已开启</a>{else}<a class="btn btn-xs btn-danger" onclick="setStatus({$data.id},1)">已关闭</a>{/if}</td><td><a href="javascript:editframe({$data.id})" class="btn btn-info btn-xs">修改信息</a> <a href="javascript:delItem({$data.id})" class="btn btn-danger btn-xs">删除</a></td></tr>
+{/volist}
+	  </tbody>
+	</table>
+  </div>
+  </div>
+<script src="//cdn.staticfile.org/layer/3.1.1/layer.js"></script>
+<script>
+function addframe(){
+	$("#modal-store").modal('show');
+	$("#modal-title").html("新增转发服务器");
+	$("#action").val("add");
+	$("#id").val('');
+	$("#server_url").val('');
+}
+function editframe(id){
+	var ii = layer.load(2);
+	$.ajax({
+		type : 'GET',
+		url : './serveritem?act=get&id='+id,
+		dataType : 'json',
+		success : function(data) {
+			layer.close(ii);
+			if(data.code == 0){
+				$("#modal-store").modal('show');
+				$("#modal-title").html("修改转发服务器");
+				$("#action").val("edit");
+				$("#id").val(data.data.id);
+				$("#server_url").val(data.data.url);
+			}else{
+				layer.alert(data.msg, {icon: 2})
+			}
+		},
+		error:function(data){
+			layer.close(ii);
+			layer.msg('服务器错误');
+		}
+	});
+}
+function save(){
+	if($("#server_url").val()==''||$("#server_token").val()==''){
+		layer.alert('必填项不能为空！');return false;
+	}
+	var ii = layer.load(2);
+	$.ajax({
+		type : 'POST',
+		url : './serveritem?act=save',
+		data : $("#form-store").serialize(),
+		dataType : 'json',
+		success : function(data) {
+			layer.close(ii);
+			if(data.code == 0){
+				layer.alert(data.msg,{
+					icon: 1,
+					closeBtn: false
+				}, function(){
+				  window.location.reload()
+				});
+			}else{
+				layer.alert(data.msg, {icon: 2})
+			}
+		},
+		error:function(data){
+			layer.close(ii);
+			layer.msg('服务器错误');
+		}
+	});
+}
+function delItem(id) {
+	var confirmobj = layer.confirm('你确实要删除此转发服务器吗？', {
+	  btn: ['确定','取消']
+	}, function(){
+	  var ii = layer.load(2);
+	  $.ajax({
+		type : 'GET',
+		url : './serveritem?act=del&id='+id,
+		dataType : 'json',
+		success : function(data) {
+			layer.close(ii);
+			if(data.code == 0){
+				window.location.reload()
+			}else{
+				layer.alert(data.msg, {icon: 2});
+			}
+		},
+		error:function(data){
+			layer.close(ii);
+			layer.msg('服务器错误');
+		}
+	  });
+	}, function(){
+	  layer.close(confirmobj);
+	});
+}
+function setStatus(id, status){
+	var ii = layer.load(2, {shade:[0.1,'#fff']});
+	$.ajax({
+		type : 'post',
+		url : './serveritem?act=set',
+		data : {id:id, status:status},
+		dataType : 'json',
+		success : function(ret) {
+			if (ret.code != 0) {
+				alert(ret.msg);
+			}
+			window.location.reload()
+		},
+		error:function(data){
+			layer.close(ii);
+			layer.msg('服务器错误');
+		}
+	});
+}
+</script>
+</body>
+</html>

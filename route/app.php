@@ -18,6 +18,7 @@ Route::get('/token', 'index/token');
 Route::get('/qytoken', 'index/qytoken');
 Route::get('/return', 'index/return');
 Route::get('/alipayreturn', 'index/alipayreturn');
+Route::any('/wxserver', 'index/wxserver');
 
 Route::any('/install', 'install/index');
 
@@ -44,6 +45,9 @@ Route::group('admin', function () {
     Route::post('/wxtoken_data', 'admin/wxtoken_data');
     Route::post('/textwxtoken', 'admin/textwxtoken');
     Route::get('/cleancache', 'admin/cleancache');
+    Route::any('/servergroup', 'admin/servergroup');
+    Route::post('/servergroup_data', 'admin/servergroup_data');
+    Route::any('/serveritem', 'admin/serveritem');
 
 })->middleware(\app\middleware\CheckAdmin::class);
 

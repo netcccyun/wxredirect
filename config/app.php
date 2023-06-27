@@ -30,5 +30,6 @@ return [
     // 显示错误信息
     'show_error_msg'   => false,
 
-    'version' => '1002'
+    'version' => '1003',
+    'dbversion' => '1003'
 ];
