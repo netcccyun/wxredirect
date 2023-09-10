@@ -241,7 +241,7 @@ class Index extends BaseController
         if(!$id) exit('param error');
         $group = Db::name('servergroup')->where('id', $id)->find();
         if(!$group) exit('服务器组不存在');
-        $items = Db::name('serveritem')->where('gid', $id)->where('status', 1)->select();
+        $items = Db::name('serveritem')->where('gid', $id)->where('status', 1)->order('sort','asc')->select();
 
         $resData = '';
         $server = new WechatServer($group['token'], $group['enckey']);

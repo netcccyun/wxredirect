@@ -91,7 +91,11 @@ class WechatServer
     public function sendRequest($url, $xml)
     {
         $params = input('get.');
-        $url = $url . '?' . http_build_query($params);
+        if(strpos($url, '?')){
+            $url = $url . '&' . http_build_query($params);
+        }else{
+            $url = $url . '?' . http_build_query($params);
+        }
         
         try{
             $response = $this->curl($url, $xml);
@@ -114,7 +118,11 @@ class WechatServer
         $params['nonce'] = random(10, 1);
         $params['timestamp'] = time();
         $params['signature'] = $this->getSignature($params['timestamp'], $params['nonce']);
-        $url = $url . '?' . http_build_query($params);
+        if(strpos($url, '?')){
+            $url = $url . '&' . http_build_query($params);
+        }else{
+            $url = $url . '?' . http_build_query($params);
+        }
 
         try{
             $response = $this->curl($url);
