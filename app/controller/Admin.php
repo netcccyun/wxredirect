@@ -325,7 +325,7 @@ class Admin extends BaseController
             $select->whereLike('name', '%'.$kw.'%');
         }
         $total = $select->count();
-        $rows = $select->alias('A')->fieldRaw("A.*,(SELECT COUNT(*) FROM wechat_serveritem WHERE gid=A.id) itemnum")->order('id','desc')->limit($offset, $limit)->select();
+        $rows = $select->alias('A')->fieldRaw("A.*,(SELECT COUNT(*) FROM ".env('database.prefix', 'wechat_')."serveritem WHERE gid=A.id) itemnum")->order('id','desc')->limit($offset, $limit)->select();
 
         return json(['total'=>$total, 'rows'=>$rows]);
     }
