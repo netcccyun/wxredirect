@@ -97,9 +97,8 @@ class Index extends BaseController
     public function alipayoauth(){
         $appid = input('get.app_id');
         $redirect_uri = input('get.redirect_uri');
-        $scope = input('get.scope');
         $state = input('get.state');
-        if(!$appid || !$redirect_uri || !$scope) return $this->error('参数不能为空');
+        if(!$appid || !$redirect_uri) return $this->error('参数不能为空');
         if(!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1'=>get_host($redirect_uri), 'domain2'=>'*.'.get_main_host($redirect_uri)])->find();
@@ -121,13 +120,43 @@ class Index extends BaseController
         $redirect_uri = request()->root(true) . '/alipayreturn';
 
         $apiurl = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm';
-        $param = [
-            "app_id" => $appid,
-            "scope" => $scope,
-            "redirect_uri" => $redirect_uri,
-            "state" => $state
-        ];
-        if(input('?get.cert_verify_id')) $param['cert_verify_id'] = input('get.cert_verify_id');
+        $param = input('get.');
+        $param['redirect_uri'] = $redirect_uri;
+        $param['state'] = $state;
+        $url = $apiurl.'?'.http_build_query($param);
+        return redirect($url);
+    }
+
+    //支付宝第三方应用授权跳转
+    public function alipayappauth(){
+        $appid = input('get.app_id');
+        $redirect_uri = input('get.redirect_uri');
+        $state = input('get.state');
+        if(!$appid || !$redirect_uri) return $this->error('参数不能为空');
+        if(!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+
+        $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1'=>get_host($redirect_uri), 'domain2'=>'*.'.get_main_host($redirect_uri)])->find();
+        if(!$drow) return $this->error('回调域名未授权');
+
+        $id = Db::name('record')->insertGetId([
+            'did' => $drow['id'],
+            'type' => 2,
+            'status' => 1,
+            'appid' => $appid,
+            'redirect_uri' => $redirect_uri,
+            'state' => $state,
+            'ip' => $this->clientip,
+            'addtime' => date("Y-m-d H:i:s"),
+            'status' => 0
+        ]);
+
+        $state = authcode2($id, 'ENCODE', config_get('syskey'));
+        $redirect_uri = request()->root(true) . '/alipayreturn';
+
+        $apiurl = 'https://openauth.alipay.com/oauth2/appToAppAuth.htm';
+        $param = input('get.');
+        $param['redirect_uri'] = $redirect_uri;
+        $param['state'] = $state;
         $url = $apiurl.'?'.http_build_query($param);
         return redirect($url);
     }
@@ -162,8 +191,9 @@ class Index extends BaseController
     //支付宝跳转回调
     public function alipayreturn(){
         $code = input('get.auth_code');
+        $app_code = input('get.app_auth_code');
         $state = input('get.state');
-        if(!$code || !$state) return $this->error('回调参数不能为空');
+        if(!$code && !$app_code || !$state) return $this->error('回调参数不能为空');
 
         $id = authcode2($state, 'DECODE', config_get('syskey'));
         if(!$id) return $this->error('state参数错误');
@@ -179,11 +209,9 @@ class Index extends BaseController
         }else{
             $redirect_uri .= '?';
         }
-        $redirect_uri .= 'auth_code='.urlencode($code);
-        if(!empty($row['state'])){
-            $redirect_uri .= '&state='.urlencode($row['state']);
-        }
-        if(input('?get.cert_verify_id')) $redirect_uri .= '&cert_verify_id='.input('get.cert_verify_id');
+        $param = input('get.');
+        $param['state'] = $row['state'];
+        $redirect_uri .= http_build_query($param);
         return redirect($redirect_uri);
     }
 
