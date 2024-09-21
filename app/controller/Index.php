@@ -175,33 +175,12 @@ class Index extends BaseController
         if(strtotime($row['addtime'])<time()-60*5) return $this->error('已超时');
         Db::name('record')->where('id', $id)->update(['status'=>1, 'endtime'=>date("Y-m-d H:i:s")]);
 
-        $redirect_uri = $row['redirect_uri'];
-        $parse_url_result = parse_url($redirect_uri);
-        $new_redirect_uri = '';
-        if (isset($parse_url_result['scheme'])) {
-            $new_redirect_uri .= $parse_url_result['scheme'] . '://';
+        $param['code'] = $code;
+        if(!empty($row['state'])){
+            $param['state'] = $row['state'];
         }
-        if (isset($parse_url_result['host'])) {
-            $new_redirect_uri .= $parse_url_result['host'];
-        }
-        if (isset($parse_url_result['path'])) {
-            $new_redirect_uri .= $parse_url_result['path'];
-        }
-        if (isset($parse_url_result['query'])) {
-            $new_redirect_uri .= '?' . $parse_url_result['query'] . '&code=' . urlencode($code);
-            if(!empty($row['state'])){
-                $new_redirect_uri .= '&state='.urlencode($row['state']);
-            }
-        } else {
-            $new_redirect_uri .= '?code=' . urlencode($code);
-            if(!empty($row['state'])){
-                $new_redirect_uri .= '&state='.urlencode($row['state']);
-            }
-        }
-        if (isset($parse_url_result['fragment'])) {
-            $new_redirect_uri .= '#' . $parse_url_result['fragment'];
-        }
-        return redirect($new_redirect_uri);
+        $redirect_uri = getRedirectUri($row['redirect_uri'], $param);
+        return redirect($redirect_uri);
     }
 
     //支付宝跳转回调
@@ -219,15 +198,9 @@ class Index extends BaseController
         if(strtotime($row['addtime'])<time()-60*5) return $this->error('已超时');
         Db::name('record')->where('id', $id)->update(['status'=>1, 'endtime'=>date("Y-m-d H:i:s")]);
 
-        $redirect_uri = $row['redirect_uri'];
-        if(strpos($redirect_uri, '?')!==false){
-            $redirect_uri .= '&';
-        }else{
-            $redirect_uri .= '?';
-        }
         $param = input('get.');
         $param['state'] = $row['state'];
-        $redirect_uri .= http_build_query($param);
+        $redirect_uri = getRedirectUri($row['redirect_uri'], $param);
         return redirect($redirect_uri);
     }
 

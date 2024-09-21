@@ -259,16 +259,20 @@ function config_set($key, $value)
 }
 
 function get_host($url){
-	$arr=parse_url($url);
-	return $arr['host'];
+	return parse_url($url, PHP_URL_HOST);
 }
 function get_main_host($url){
-	$arr=parse_url($url);
-	$host = $arr['host'];
-	if(substr_count($host, '.')>1){
-		$host = substr($host, strpos($host, '.')+1);
+	$host = parse_url($url, PHP_URL_HOST);
+	if(filter_var($host, FILTER_VALIDATE_IP)) return $host;
+	$data = explode('.', $host);
+	$co_ta = count($data);
+	if($co_ta <= 2) return $host;
+	$domain_name = $data[$co_ta-2].'.'.$data[$co_ta-1];
+	$top_domain_list = ['ac.cn','ah.cn','bj.cn','com.cn','cq.cn','fj.cn','gd.cn','gs.cn','gx.cn','gz.cn','ha.cn','hb.cn','he.cn','hi.cn','hk.cn','hl.cn','hn.cn','jl.cn','js.cn','jx.cn','ln.cn','mo.cn','net.cn','nm.cn','nx.cn','org.cn','qh.cn','sc.cn','sd.cn','sh.cn','sn.cn','sx.cn','tj.cn','tw.cn','xj.cn','xz.cn','yn.cn','zj.cn','ae.com','africa.com','ar.com','br.com','cn.com','co.com','de.com','eu.com','gb.com','gr.com','hk.com','hu.com','jpn.com','kr.com','mex.com','no.com','nv.com','qc.com','ru.com','sa.com','se.com','uk.com','us.com','uy.com','za.com','com.hk','edu.hk','gov.hk','idv.hk','inc.hk','ltd.hk','net.hk','org.hk','ae.org','hk.org','us.org','gov.cn','mil.cn','edu.cn','com.tw','com.uk','com.us'];
+	if(in_array($domain_name, $top_domain_list) && $co_ta > 2){
+		$domain_name = $data[$co_ta-3].'.'.$domain_name;
 	}
-	return $host;
+	return $domain_name;
 }
 
 function checkDomain($domain){
@@ -397,4 +401,29 @@ function getRequstStatus($status){
 	}elseif($status == 0){
 		return '<font color="grey">暂未请求</font>';
 	}
+}
+
+function getRedirectUri($redirect_uri, $param){
+	$parse_url_result = parse_url($redirect_uri);
+	$new_redirect_uri = '';
+	if (isset($parse_url_result['scheme'])) {
+		$new_redirect_uri .= $parse_url_result['scheme'] . '://';
+	}
+	if (isset($parse_url_result['host'])) {
+		$new_redirect_uri .= $parse_url_result['host'];
+	}
+	if (isset($parse_url_result['path'])) {
+		$new_redirect_uri .= $parse_url_result['path'];
+	} else {
+		$new_redirect_uri .= '/';
+	}
+	if (isset($parse_url_result['query'])) {
+		$new_redirect_uri .= '?' . $parse_url_result['query'] . '&' . http_build_query($param);
+	} else {
+		$new_redirect_uri .= '?' . http_build_query($param);
+	}
+	if (isset($parse_url_result['fragment'])) {
+		$new_redirect_uri .= '#' . $parse_url_result['fragment'];
+	}
+	return $new_redirect_uri;
 }
