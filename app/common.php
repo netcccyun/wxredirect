@@ -412,6 +412,9 @@ function getRedirectUri($redirect_uri, $param){
 	if (isset($parse_url_result['host'])) {
 		$new_redirect_uri .= $parse_url_result['host'];
 	}
+	if (isset($parse_url_result['port'])) {
+		$new_redirect_uri .= ':' . $parse_url_result['port'];
+	}
 	if (isset($parse_url_result['path'])) {
 		$new_redirect_uri .= $parse_url_result['path'];
 	} else {

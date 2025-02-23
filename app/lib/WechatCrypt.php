@@ -24,7 +24,7 @@ class WechatCrypt
     public function decrypt($data)
     {
         $decrypted = openssl_decrypt($data, 'AES-256-CBC', $this->key, OPENSSL_ZERO_PADDING, $this->iv);
-        if(!$decrypted) return false;
+        if (!$decrypted) return false;
         $decrypted = $this->dePKSC7($decrypted);
 
         $content = substr($decrypted, 16, strlen($decrypted));
@@ -53,7 +53,7 @@ class WechatCrypt
         }
         return $text . $tmp;
     }
-    
+
     private function dePKSC7($text)
     {
         $block_size = self::$block_size; //128:16、256:32
