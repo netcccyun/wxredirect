@@ -22,6 +22,8 @@ class Index extends BaseController
         $redirect_uri = input('get.redirect_uri');
         $scope = input('?get.scope') ? input('get.scope') : 'snsapi_base';
         $state = input('get.state');
+        $forcePopup	= input('?get.forcePopup') ? input('get.forcePopup') : 'false';
+        
         if (!$appid || !$redirect_uri || !$scope) return $this->error('参数不能为空');
         if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
 
@@ -48,6 +50,7 @@ class Index extends BaseController
             "redirect_uri" => $redirect_uri,
             "response_type" => "code",
             "scope" => $scope,
+            "forcePopup" => $forcePopup,
             "state" => $state
         ];
         if (input('?get.agentid')) $param['agentid'] = input('get.agentid');
