@@ -362,14 +362,19 @@ class Admin extends BaseController
                 $sort = input('post.sort/d');
                 $server_url = input('post.server_url', null, 'trim');
                 if (!$server_url) return json(['code' => -1, 'msg' => '服务器URL不能为空']);
-                if (parse_url($server_url)['host'] == request()->host()) return json(['code' => -1, 'msg' => '服务器URL不能是当前站点']);
+                $parsed = parse_url($server_url);
+                if (empty($parsed['scheme']) || empty($parsed['host']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'], true)) {
+                    return json(['code' => -1, 'msg' => '服务器URL格式不正确']);
+                }
+                if ($parsed['host'] == request()->host()) return json(['code' => -1, 'msg' => '服务器URL不能是当前站点']);
                 if (input('post.action') == 'add') {
                     if (Db::name('serveritem')->where('gid', $gid)->where('url', $server_url)->find()) {
                         return json(['code' => -1, 'msg' => '服务器URL已存在']);
                     }
                     $group = Db::name('servergroup')->where('id', $gid)->find();
+                    if (!$group) return json(['code' => -1, 'msg' => '服务器组不存在']);
                     $server = new WechatServer($group['token'], $group['enckey']);
-                    if ($group['type'] == 0 && !$server->verifyWechatServer($server_url) || $group['type'] == 1 && !$server->verifyWeWorkServer($server_url)) {
+                    if (($group['type'] == 0 && !$server->verifyWechatServer($server_url)) || ($group['type'] == 1 && !$server->verifyWeWorkServer($server_url))) {
                         return json(['code' => -1, 'msg' => '服务器Token验证失败']);
                     }
                     Db::name('serveritem')->insert([
@@ -411,8 +416,6 @@ class Admin extends BaseController
 
             if (empty($params['username'])) return json(['code' => -1, 'msg' => '用户名不能为空']);
 
-            config_set('admin_username', $params['username']);
-
             if (!empty($params['oldpwd']) && !empty($params['newpwd']) && !empty($params['newpwd2'])) {
                 if (config_get('admin_password') != $params['oldpwd']) {
                     return json(['code' => -1, 'msg' => '旧密码不正确']);
@@ -422,6 +425,8 @@ class Admin extends BaseController
                 }
                 config_set('admin_password', $params['newpwd']);
             }
+
+            config_set('admin_username', $params['username']);
             cache('configs', NULL);
             cookie('admin_token', null);
             return json(['code' => 0]);

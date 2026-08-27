@@ -15,6 +15,7 @@ Route::get('/connect/oauth2/authorize', 'index/connect');
 Route::get('/connect/qrconnect', 'index/qrconnect');
 Route::get('/alipayoauth', 'index/alipayoauth');
 Route::get('/alipayappauth', 'index/alipayappauth');
+Route::get('/qqoauth', 'index/qqoauth');
 Route::get('/token', 'index/token');
 Route::get('/qytoken', 'index/qytoken');
 Route::get('/return', 'index/return');

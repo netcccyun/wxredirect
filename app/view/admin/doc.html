@@ -7,8 +7,8 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>帮助文档</title>
-    <link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-3.4.1.min.css">
+    <link rel="stylesheet" href="/static/css/github-markdown-5.1.0.min.css">
     <style>
         body {background-color: #eee!important;}
         .center-block {margin: 0 auto; float: none; padding: 0;}
@@ -31,7 +31,7 @@
 <body>
 <div class="container">
 <div class="row">
-<div class="col-md-12 col-lg-10 col-xl-8 center-block">
+<div class="col-md-12 col-lg-10 col-lg-8 center-block">
 <div class="markdown-body">
     <h1 id="wxredirect">微信多域名回调功能</h2>
     <h3>功能简介：</h3>
@@ -69,6 +69,14 @@
         <p>将业务代码中的<code>https://openauth.alipay.com/oauth2/publicAppAuthorize.htm</code>替换成<code>{$siteurl}/alipayoauth</code></p>
         <p>将业务代码中的<code>https://openauth.alipay.com/oauth2/appToAppAuth.htm</code>替换成<code>{$siteurl}/alipayappauth</code></p>
         <p><strong>注：业务系统的域名，需要先在本站回调域名管理里面添加。支付宝开发平台应用只需要授权本站的域名。</strong></p>
+    <p>&nbsp;</p>
+    <h1 id="qqoauth">QQ互联多域名回调功能</h2>
+        <h3>功能简介：</h3>
+        <p>每个QQ互联应用只能配置1个网站回调地址，用本系统突破这个限制，可同时在多个网站使用同一个QQ互联应用。</p>
+        <h3>使用方法：</h3>
+        <p>将业务代码中的<code>https://graph.qq.com/oauth2.0/authorize</code>替换成<code>{$siteurl}/qqoauth</code></p>
+        <p>QQ互联后台填写的网站回调地址为：<code>{$siteurl}/return</code></p>
+        <p><strong>注：业务系统的域名，需要先在本站回调域名管理里面添加。QQ互联应用只需要授权本站的回调地址，填写完整URL而不是域名。</strong></p>
     <p>&nbsp;</p>
 </div>
 </div>

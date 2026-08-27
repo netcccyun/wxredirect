@@ -1,4 +1,5 @@
 <?php
+
 namespace app\controller;
 
 use app\BaseController;
@@ -30,7 +31,6 @@ class Index extends BaseController
         $id = Db::name('record')->insertGetId([
             'did' => $drow['id'],
             'type' => 0,
-            'status' => 1,
             'appid' => $appid,
             'redirect_uri' => $redirect_uri,
             'state' => $state,
@@ -71,7 +71,6 @@ class Index extends BaseController
         $id = Db::name('record')->insertGetId([
             'did' => $drow['id'],
             'type' => 1,
-            'status' => 1,
             'appid' => $appid,
             'redirect_uri' => $redirect_uri,
             'state' => $state,
@@ -110,7 +109,6 @@ class Index extends BaseController
         $id = Db::name('record')->insertGetId([
             'did' => $drow['id'],
             'type' => 2,
-            'status' => 1,
             'appid' => $appid,
             'redirect_uri' => $redirect_uri,
             'state' => $state,
@@ -145,7 +143,6 @@ class Index extends BaseController
         $id = Db::name('record')->insertGetId([
             'did' => $drow['id'],
             'type' => 2,
-            'status' => 1,
             'appid' => $appid,
             'redirect_uri' => $redirect_uri,
             'state' => $state,
@@ -158,6 +155,40 @@ class Index extends BaseController
         $redirect_uri = request()->root(true) . '/alipayreturn';
 
         $apiurl = 'https://openauth.alipay.com/oauth2/appToAppAuth.htm';
+        $param = input('get.');
+        $param['redirect_uri'] = $redirect_uri;
+        $param['state'] = $state;
+        $url = $apiurl . '?' . http_build_query($param);
+        return redirect($url);
+    }
+
+    //QQ互联登录跳转
+    public function qqoauth()
+    {
+        $appid = input('get.client_id');
+        $redirect_uri = input('get.redirect_uri');
+        $state = input('get.state');
+        if (!$appid || !$redirect_uri) return $this->error('参数不能为空');
+        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+
+        $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
+        if (!$drow) return $this->error('回调域名未授权');
+
+        $id = Db::name('record')->insertGetId([
+            'did' => $drow['id'],
+            'type' => 3,
+            'appid' => $appid,
+            'redirect_uri' => $redirect_uri,
+            'state' => $state,
+            'ip' => $this->clientip,
+            'addtime' => date("Y-m-d H:i:s"),
+            'status' => 0
+        ]);
+
+        $state = authcode2($id, 'ENCODE', config_get('syskey'));
+        $redirect_uri = request()->root(true) . '/return';
+
+        $apiurl = 'https://graph.qq.com/oauth2.0/authorize';
         $param = input('get.');
         $param['redirect_uri'] = $redirect_uri;
         $param['state'] = $state;
@@ -194,7 +225,7 @@ class Index extends BaseController
         $code = input('get.auth_code');
         $app_code = input('get.app_auth_code');
         $state = input('get.state');
-        if (!$code && !$app_code || !$state) return $this->error('回调参数不能为空');
+        if ((!$code && !$app_code) || !$state) return $this->error('回调参数不能为空');
 
         $id = authcode2($state, 'DECODE', config_get('syskey'));
         if (!$id) return $this->error('state参数错误');
@@ -205,7 +236,11 @@ class Index extends BaseController
         Db::name('record')->where('id', $id)->update(['status' => 1, 'endtime' => date("Y-m-d H:i:s")]);
 
         $param = input('get.');
-        $param['state'] = $row['state'];
+        if (!empty($row['state'])) {
+            $param['state'] = $row['state'];
+        } else {
+            unset($param['state']);
+        }
         $redirect_uri = getRedirectUri($row['redirect_uri'], $param);
         return redirect($redirect_uri);
     }
@@ -218,7 +253,7 @@ class Index extends BaseController
         if (!$appid) return json(['errcode' => 40001, 'errmsg' => 'appid missing']);
         if (!$appsecret) return json(['errcode' => 40002, 'errmsg' => 'appsecret missing']);
 
-        $row = Db::name('token')->where('appid', $appid)->find();
+        $row = Db::name('token')->where('appid', $appid)->where('status', 1)->where('type', '<>', 3)->find();
         if (!$row) return json(['errcode' => 40003, 'errmsg' => 'invalid appid']);
         if ($row['appsecret'] !== $appsecret) return json(['errcode' => 40003, 'errmsg' => 'invalid appsecret']);
 
@@ -243,7 +278,7 @@ class Index extends BaseController
         if (!$corpid) return json(['errcode' => 40001, 'errmsg' => 'corpid missing']);
         if (!$corpsecret) return json(['errcode' => 40002, 'errmsg' => 'corpsecret missing']);
 
-        $row = Db::name('token')->where('appid', $corpid)->where('type', 3)->find();
+        $row = Db::name('token')->where('appid', $corpid)->where('type', 3)->where('status', 1)->find();
         if (!$row) return json(['errcode' => 40003, 'errmsg' => 'invalid corpid']);
         if ($row['appsecret'] !== $corpsecret) return json(['errcode' => 40003, 'errmsg' => 'invalid corpsecret']);
 
