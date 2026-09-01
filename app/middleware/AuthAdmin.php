@@ -10,7 +10,7 @@ class AuthAdmin
     {
         $islogin = false;
         $cookie = cookie('admin_token');
-        if($cookie){
+        if($cookie && config_get('syskey')){
             $token=authcode($cookie, 'DECODE', config_get('syskey'));
             if($token){
                 list($user, $sid, $expiretime) = explode("\t", $token);
