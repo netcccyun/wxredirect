@@ -28,7 +28,9 @@ class WechatCrypt
         $decrypted = $this->dePKSC7($decrypted);
 
         $content = substr($decrypted, 16, strlen($decrypted));
+        if (strlen($content) < 4) return false;
         $len_list = unpack('N', substr($content, 0, 4));
+        if (!$len_list) return false;
         $xml_len = $len_list[1];
         $xml_content = substr($content, 4, $xml_len);
         $from_appid = substr($content, $xml_len + 4);

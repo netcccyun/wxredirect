@@ -8,7 +8,7 @@ CREATE TABLE `wechat_config` (
 INSERT INTO `wechat_config` (`key`, `value`) VALUES
 ('admin_password', ''),
 ('admin_username', ''),
-('version', '1003'),
+('version', '1004'),
 ('ip_type', '0'),
 ('syskey', '');
 
@@ -30,7 +30,7 @@ CREATE TABLE `wechat_record` (
   `appid` varchar(32) NOT NULL,
   `redirect_uri` text NOT NULL,
   `state` text DEFAULT NULL,
-  `ip` varchar(20) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
   `addtime` datetime DEFAULT NULL,
   `endtime` datetime DEFAULT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '0',

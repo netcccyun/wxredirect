@@ -28,7 +28,7 @@ class Admin extends BaseController
             if (empty($username) || empty($password)) {
                 return json(['code' => -1, 'msg' => '用户名或密码不能为空']);
             }
-            if (!captcha_check($code)) {
+            if (empty($code) || !is_string($code) || !captcha_check($code)) {
                 return json(['code' => -1, 'msg' => '验证码错误']);
             }
             if ($username === config_get('admin_username') && $password === config_get('admin_password')) {
@@ -82,7 +82,7 @@ class Admin extends BaseController
             'framework_version' => app()::VERSION,
             'php_version' => PHP_VERSION,
             'mysql_version' => $mysqlVersion,
-            'software' => $_SERVER['SERVER_SOFTWARE'],
+            'software' => $_SERVER['SERVER_SOFTWARE'] ?? '',
             'os' => php_uname(),
             'date' => date("Y-m-d H:i:s"),
         ];
@@ -276,6 +276,7 @@ class Admin extends BaseController
             if ($act == 'get') {
                 $id = input('get.id/d');
                 $row = Db::name('servergroup')->where('id', $id)->find();
+                if (!$row) return json(['code' => -1, 'msg' => '服务器组不存在']);
                 $row['url'] = request()->root(true).'/wxserver/id/'.$id;
                 return json(['code' => 0, 'data' => $row]);
             } elseif ($act == 'del') {
@@ -417,10 +418,10 @@ class Admin extends BaseController
             if (empty($params['username'])) return json(['code' => -1, 'msg' => '用户名不能为空']);
 
             if (!empty($params['oldpwd']) && !empty($params['newpwd']) && !empty($params['newpwd2'])) {
-                if (config_get('admin_password') != $params['oldpwd']) {
+                if ((string)config_get('admin_password') !== $params['oldpwd']) {
                     return json(['code' => -1, 'msg' => '旧密码不正确']);
                 }
-                if ($params['newpwd'] != $params['newpwd2']) {
+                if ($params['newpwd'] !== $params['newpwd2']) {
                     return json(['code' => -1, 'msg' => '两次新密码输入不一致']);
                 }
                 config_set('admin_password', $params['newpwd']);

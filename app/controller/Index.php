@@ -25,7 +25,7 @@ class Index extends BaseController
         $forcePopup	= input('?get.forcePopup') ? input('get.forcePopup') : 'false';
         
         if (!$appid || !$redirect_uri || !$scope) return $this->error('参数不能为空');
-        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+        if (!checkRedirectUrl($redirect_uri)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
         if (!$drow) return $this->error('回调域名未授权');
@@ -66,7 +66,7 @@ class Index extends BaseController
         $scope = input('?get.scope') ? input('get.scope') : 'snsapi_login';
         $state = input('get.state');
         if (!$appid || !$redirect_uri || !$scope) return $this->error('参数不能为空');
-        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+        if (!checkRedirectUrl($redirect_uri)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
         if (!$drow) return $this->error('回调域名未授权');
@@ -104,7 +104,7 @@ class Index extends BaseController
         $redirect_uri = input('get.redirect_uri');
         $state = input('get.state');
         if (!$appid || !$redirect_uri) return $this->error('参数不能为空');
-        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+        if (!checkRedirectUrl($redirect_uri)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
         if (!$drow) return $this->error('回调域名未授权');
@@ -138,7 +138,7 @@ class Index extends BaseController
         $redirect_uri = input('get.redirect_uri');
         $state = input('get.state');
         if (!$appid || !$redirect_uri) return $this->error('参数不能为空');
-        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+        if (!checkRedirectUrl($redirect_uri)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
         if (!$drow) return $this->error('回调域名未授权');
@@ -172,7 +172,7 @@ class Index extends BaseController
         $redirect_uri = input('get.redirect_uri');
         $state = input('get.state');
         if (!$appid || !$redirect_uri) return $this->error('参数不能为空');
-        if (!filter_var($redirect_uri, FILTER_VALIDATE_URL)) return $this->error('redirect_uri参数错误');
+        if (!checkRedirectUrl($redirect_uri)) return $this->error('redirect_uri参数错误');
 
         $drow = Db::name('domain')->whereRaw('(domain=:domain1 OR domain=:domain2) AND status=1', ['domain1' => get_host($redirect_uri), 'domain2' => '*.' . get_main_host($redirect_uri)])->find();
         if (!$drow) return $this->error('回调域名未授权');
@@ -258,7 +258,7 @@ class Index extends BaseController
 
         $row = Db::name('token')->where('appid', $appid)->where('status', 1)->where('type', '<>', 3)->find();
         if (!$row) return json(['errcode' => 40003, 'errmsg' => 'invalid appid']);
-        if ($row['appsecret'] !== $appsecret) return json(['errcode' => 40003, 'errmsg' => 'invalid appsecret']);
+        if (!hash_equals((string)$row['appsecret'], (string)$appsecret)) return json(['errcode' => 40003, 'errmsg' => 'invalid appsecret']);
 
         if ($row['access_token'] && strtotime($row['expiretime']) - 180 >= time()) {
             $expires_in = strtotime($row['expiretime']) - time();
@@ -283,7 +283,7 @@ class Index extends BaseController
 
         $row = Db::name('token')->where('appid', $corpid)->where('type', 3)->where('status', 1)->find();
         if (!$row) return json(['errcode' => 40003, 'errmsg' => 'invalid corpid']);
-        if ($row['appsecret'] !== $corpsecret) return json(['errcode' => 40003, 'errmsg' => 'invalid corpsecret']);
+        if (!hash_equals((string)$row['appsecret'], (string)$corpsecret)) return json(['errcode' => 40003, 'errmsg' => 'invalid corpsecret']);
 
         if ($row['access_token'] && strtotime($row['expiretime']) - 180 >= time()) {
             $expires_in = strtotime($row['expiretime']) - time();

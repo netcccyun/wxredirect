@@ -20,10 +20,13 @@ class WechatServer
 		if (!(isset($_GET['signature']) && isset($_GET['timestamp']) && isset($_GET['nonce']))) {
 			return false;
 		}
+		if (!is_string($_GET['signature']) || !is_string($_GET['timestamp']) || !is_string($_GET['nonce'])) {
+			return false;
+		}
 
         $signature = $this->getSignature($_GET['timestamp'], $_GET['nonce']);
 
-		return $signature === $_GET['signature'];
+		return hash_equals($signature, $_GET['signature']);
 	}
 
     //验证消息签名
@@ -32,10 +35,13 @@ class WechatServer
         if (!(isset($_GET['msg_signature']) && isset($_GET['timestamp']) && isset($_GET['nonce']))) {
 			return false;
 		}
+		if (!is_string($_GET['msg_signature']) || !is_string($_GET['timestamp']) || !is_string($_GET['nonce']) || !is_string($msg_encrypt)) {
+			return false;
+		}
 
         $signature = $this->getSignature($_GET['timestamp'], $_GET['nonce'], $msg_encrypt);
 
-		return $signature === $_GET['msg_signature'];
+		return hash_equals($signature, $_GET['msg_signature']);
     }
 
     //生成SHA1签名
@@ -74,6 +80,7 @@ class WechatServer
 			if (!$this->verifyMsgSignature($_GET['echostr'])) {
                 exit('签名验证失败');
             }
+            if (!$this->crypt) exit('未配置EncodingAESKey');
             $msg = $this->crypt->decrypt($_GET['echostr']);
             if(!$msg) exit('消息解密失败');
             exit($msg);
@@ -145,7 +152,7 @@ class WechatServer
     private function curl($url, $xml = null, $timeout = 3)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

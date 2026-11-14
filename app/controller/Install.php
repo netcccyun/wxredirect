@@ -28,6 +28,16 @@ class Install extends BaseController
                 return json(['code' => 0, 'msg' => '必填项不能为空']);
             }
 
+            if (!preg_match('/^[A-Za-z0-9_]+$/D', $mysql_prefix)) {
+                return json(['code' => 0, 'msg' => '数据表前缀只能包含字母、数字和下划线']);
+            }
+
+            foreach ([$mysql_host, $mysql_user, $mysql_pwd, $mysql_name] as $envValue) {
+                if (preg_match('/[\r\n]/', $envValue)) {
+                    return json(['code' => 0, 'msg' => '数据库配置信息不能包含换行符']);
+                }
+            }
+
             $configData = file_get_contents(app()->getRootPath() . '.example.env');
             $configData = str_replace(['{dbhost}', '{dbname}', '{dbuser}', '{dbpwd}', '{dbport}', '{dbprefix}'], [$mysql_host, $mysql_name, $mysql_user, $mysql_pwd, $mysql_port, $mysql_prefix], $configData);
 
@@ -47,20 +57,24 @@ class Install extends BaseController
             }
             $DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
             $DB->exec("set sql_mode = ''");
-            $DB->exec("set names utf8");
+            $DB->exec("set names utf8mb4");
 
             $sqls = file_get_contents(app()->getAppPath() . 'sql/install.sql');
             $sqls = explode(';', $sqls);
-            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('syskey', '".random(16)."')";
-            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('admin_username', '".addslashes($admin_username)."')";
-            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('admin_password', '".addslashes($admin_password)."')";
+            // 只替换安装SQL中的表前缀，避免误替换管理员账号密码中包含的“wechat_”字符
+            foreach ($sqls as &$sql) {
+                $sql = str_replace('wechat_', $mysql_prefix, $sql);
+            }
+            unset($sql);
+            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('syskey', ".$DB->quote(random(16)).")";
+            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('admin_username', ".$DB->quote($admin_username).")";
+            $sqls[]="REPLACE INTO `".$mysql_prefix."config` VALUES ('admin_password', ".$DB->quote($admin_password).")";
             $success = 0;
             $error = 0;
             $errorMsg = null;
             foreach ($sqls as $value) {
                 $value = trim($value);
                 if (empty($value)) continue;
-                $value = str_replace('wechat_', $mysql_prefix, $value);
                 if ($DB->exec($value) === false) {
                     $error++;
                     $dberror = $DB->errorInfo();

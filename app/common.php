@@ -46,7 +46,7 @@ function get_curl($url, $post=0, $referer=0, $cookie=0, $header=0, $ua=0, $nobod
 }
 
 function real_ip($type=0){
-    $ip = $_SERVER['REMOTE_ADDR'];
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     if($type<=0 && isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
         foreach ($matches[0] AS $xip) {
             if (filter_var($xip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
@@ -65,13 +65,13 @@ function real_ip($type=0){
 }
 
 function strexists($string, $find) {
-	return !(strpos($string, $find) === FALSE);
+	return !(strpos((string)$string, (string)$find) === FALSE);
 }
 
 function dstrpos($string, $arr) {
 	if(empty($string)) return false;
 	foreach((array)$arr as $v) {
-		if(strpos($string, $v) !== false) {
+		if(strpos((string)$string, (string)$v) !== false) {
 			return true;
 		}
 	}
@@ -79,17 +79,19 @@ function dstrpos($string, $arr) {
 }
 
 function checkmobile() {
-	$useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
+	$useragent = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
 	$ualist = array('android', 'midp', 'nokia', 'mobile', 'iphone', 'ipod', 'blackberry', 'windows phone');
-	if((dstrpos($useragent, $ualist) || strexists($_SERVER['HTTP_ACCEPT'], "VND.WAP") || strexists($_SERVER['HTTP_VIA'],"wap")))
+	if((dstrpos($useragent, $ualist) || strexists($_SERVER['HTTP_ACCEPT'] ?? '', "VND.WAP") || strexists($_SERVER['HTTP_VIA'] ?? '',"wap")))
 		return true;
 	else
 		return false;
 }
 
 function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
+	if (!is_scalar($string)) return '';
+	$string = (string)$string;
 	$ckey_length = 4;
-	$key = md5($key);
+	$key = md5((string)$key);
 	$keya = md5(substr($key, 0, 16));
 	$keyb = md5(substr($key, 16, 16));
 	$keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length): substr(md5(microtime()), -$ckey_length)) : '';
@@ -155,14 +157,16 @@ function base62_decode($data){
     $data = strval($data);
     $base62 = str_split($base62str);
     $base62Arr = array_flip($base62);
-    if(!preg_match('/[a-zA-Z0-9]+/',$data)){
+    if(!preg_match('/^[a-zA-Z0-9]+$/',$data)){
         return false;
     }
     $len = strlen($data);
     $i = 0;
     $tempArr = array();
     while($i<$len){
-        $temp = decbin(($base62Arr[$data[$i]]-$i%2)/4);
+        $val = $base62Arr[$data[$i]] - $i%2;
+        if($val < 0 || $val % 4 !== 0) return false;
+        $temp = decbin(intdiv($val, 4));
         $tempArr[] = str_pad($temp,4,'0',STR_PAD_LEFT);
         ++$i;
     }
@@ -174,8 +178,10 @@ function base62_decode($data){
     return $result;
 }
 function authcode2($string, $operation = 'DECODE', $key = '', $expiry = 0) {
+	if (!is_scalar($string)) return '';
+	$string = (string)$string;
 	$ckey_length = 4;
-	$key = md5($key);
+	$key = md5((string)$key);
 	$keya = md5(substr($key, 0, 16));
 	$keyb = md5(substr($key, 16, 16));
 	$keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length): substr(md5(microtime()), -$ckey_length)) : '';
@@ -215,12 +221,12 @@ function authcode2($string, $operation = 'DECODE', $key = '', $expiry = 0) {
 }
 
 function random($length, $numeric = 0) {
-	$seed = base_convert(md5(microtime().$_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
+	$seed = base_convert(md5(microtime().($_SERVER['DOCUMENT_ROOT'] ?? '').random_bytes(16)), 16, $numeric ? 10 : 35);
 	$seed = $numeric ? (str_replace('0', '', $seed).'012340567890') : ($seed.'zZ'.strtoupper($seed));
 	$hash = '';
 	$max = strlen($seed) - 1;
 	for($i = 0; $i < $length; $i++) {
-		$hash .= $seed[mt_rand(0, $max)];
+		$hash .= $seed[random_int(0, $max)];
 	}
 	return $hash;
 }
@@ -263,6 +269,7 @@ function get_host($url){
 }
 function get_main_host($url){
 	$host = parse_url($url, PHP_URL_HOST);
+	if(empty($host)) return '';
 	if(filter_var($host, FILTER_VALIDATE_IP)) return $host;
 	$data = explode('.', $host);
 	$co_ta = count($data);
@@ -275,6 +282,15 @@ function get_main_host($url){
 	return $domain_name;
 }
 
+//校验回调地址：必须是合法的http/https网址
+function checkRedirectUrl($url){
+	if(!is_string($url) || !filter_var($url, FILTER_VALIDATE_URL)) return false;
+	$scheme = parse_url($url, PHP_URL_SCHEME);
+	if(!$scheme || !in_array(strtolower($scheme), ['http', 'https'], true)) return false;
+	if(empty(parse_url($url, PHP_URL_HOST))) return false;
+	return true;
+}
+
 function checkDomain($domain){
 	if(empty($domain) || !preg_match('/^[-$a-z0-9_*.]{2,512}$/i', $domain) || (stripos($domain, '.') === false) || substr($domain, -1) == '.' || substr($domain, 0 ,1) == '.' || substr($domain, 0 ,1) == '*' && substr($domain, 1 ,1) != '.' || substr_count($domain, '*')>1 || strpos($domain, '*')>0 || strlen($domain)<4) return false;
 	return true;
@@ -283,9 +299,9 @@ function checkDomain($domain){
 function getSubstr($str, $leftStr, $rightStr)
 {
 	$left = strpos($str, $leftStr);
+	if($left === false) return '';
 	$start = $left+strlen($leftStr);
 	$right = strpos($str, $rightStr, $start);
-	if($left < 0) return '';
 	if($right>0){
 		return substr($str, $start, $right-$start);
 	}else{
@@ -296,7 +312,8 @@ function getSubstr($str, $leftStr, $rightStr)
 function checkRefererHost(){
     if(!request()->header('referer'))return false;
     $url_arr = parse_url(request()->header('referer'));
-    $http_host = request()->header('host');
+    if(!is_array($url_arr) || empty($url_arr['host'])) return false;
+    $http_host = (string)request()->header('host');
     if(strpos($http_host,':'))$http_host = substr($http_host, 0, strpos($http_host, ':'));
     return $url_arr['host'] === $http_host;
 }

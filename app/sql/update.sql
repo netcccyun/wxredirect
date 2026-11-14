@@ -22,3 +22,5 @@ CREATE TABLE IF NOT EXISTS `wechat_serveritem` (
  PRIMARY KEY (`id`),
  KEY `gid` (`gid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `wechat_record` MODIFY COLUMN `ip` varchar(50) DEFAULT NULL;

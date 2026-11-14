@@ -56,7 +56,8 @@
             "support": {
                 "source": "https://github.com/netcccyun/think-captcha/tree/3.0.12"
             },
-            "time": "2026-06-23T15:30:22+00:00"
+            "time": "2026-06-23T15:30:22+00:00",
+            "published-time": "2026-06-23T15:32:18+00:00"
         },
         {
             "name": "psr/container",
@@ -109,7 +110,8 @@
                 "issues": "https://github.com/php-fig/container/issues",
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
-            "time": "2021-11-05T16:47:00+00:00"
+            "time": "2021-11-05T16:47:00+00:00",
+            "published-time": "2021-11-05T16:53:27+00:00"
         },
         {
             "name": "psr/http-message",
@@ -162,7 +164,8 @@
             "support": {
                 "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
-            "time": "2023-04-04T09:54:51+00:00"
+            "time": "2023-04-04T09:54:51+00:00",
+            "published-time": "2023-04-04T09:55:35+00:00"
         },
         {
             "name": "psr/log",
@@ -212,7 +215,8 @@
             "support": {
                 "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
-            "time": "2024-09-11T13:17:53+00:00"
+            "time": "2024-09-11T13:17:53+00:00",
+            "published-time": "2024-09-11T13:21:14+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -263,7 +267,8 @@
             "support": {
                 "source": "https://github.com/php-fig/simple-cache/tree/3.0.0"
             },
-            "time": "2021-10-29T13:26:27+00:00"
+            "time": "2021-10-29T13:26:27+00:00",
+            "published-time": "2021-10-29T13:27:19+00:00"
         },
         {
             "name": "topthink/framework",
@@ -331,7 +336,8 @@
                 "issues": "https://github.com/top-think/framework/issues",
                 "source": "https://github.com/top-think/framework/tree/v8.1.4"
             },
-            "time": "2026-01-15T02:45:10+00:00"
+            "time": "2026-01-15T02:45:10+00:00",
+            "published-time": "2026-01-16T00:47:38+00:00"
         },
         {
             "name": "topthink/think-container",
@@ -377,7 +383,8 @@
                 "issues": "https://github.com/top-think/think-container/issues",
                 "source": "https://github.com/top-think/think-container/tree/v3.0.2"
             },
-            "time": "2025-04-07T03:21:51+00:00"
+            "time": "2025-04-07T03:21:51+00:00",
+            "published-time": "2025-05-06T09:23:28+00:00"
         },
         {
             "name": "topthink/think-helper",
@@ -423,7 +430,8 @@
                 "issues": "https://github.com/top-think/think-helper/issues",
                 "source": "https://github.com/top-think/think-helper/tree/v3.1.12"
             },
-            "time": "2025-12-26T09:58:29+00:00"
+            "time": "2025-12-26T09:58:29+00:00",
+            "published-time": "2025-12-26T10:00:03+00:00"
         },
         {
             "name": "topthink/think-orm",
@@ -483,7 +491,8 @@
                 "issues": "https://github.com/top-think/think-orm/issues",
                 "source": "https://github.com/top-think/think-orm/tree/v4.0.51"
             },
-            "time": "2025-12-18T13:11:52+00:00"
+            "time": "2025-12-18T13:11:52+00:00",
+            "published-time": "2026-01-01T12:11:42+00:00"
         },
         {
             "name": "topthink/think-template",
@@ -524,7 +533,8 @@
                 "issues": "https://github.com/top-think/think-template/issues",
                 "source": "https://github.com/top-think/think-template/tree/v3.0.2"
             },
-            "time": "2024-10-16T03:41:06+00:00"
+            "time": "2024-10-16T03:41:06+00:00",
+            "published-time": "2024-11-22T04:17:38+00:00"
         },
         {
             "name": "topthink/think-validate",
@@ -568,7 +578,8 @@
                 "issues": "https://github.com/top-think/think-validate/issues",
                 "source": "https://github.com/top-think/think-validate/tree/v3.0.7"
             },
-            "time": "2025-06-11T05:51:40+00:00"
+            "time": "2025-06-11T05:51:40+00:00",
+            "published-time": "2025-06-11T05:53:16+00:00"
         },
         {
             "name": "topthink/think-view",
@@ -609,22 +620,23 @@
                 "issues": "https://github.com/top-think/think-view/issues",
                 "source": "https://github.com/top-think/think-view/tree/v2.0.5"
             },
-            "time": "2025-03-19T07:04:19+00:00"
+            "time": "2025-03-19T07:04:19+00:00",
+            "published-time": "2025-03-19T08:30:40+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.7.1",
+            "version": "v3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d"
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/f3202fa1b5097b0af062dc978b32ecf63404e31d",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/feb1edf4e546af3b85c5caebe8359a20db230ca3",
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3",
                 "shasum": ""
             },
             "require": {
@@ -637,7 +649,7 @@
                     "name": "symfony/contracts"
                 },
                 "branch-alias": {
-                    "dev-main": "3.7-dev"
+                    "dev-main": "3.8-dev"
                 }
             },
             "autoload": {
@@ -662,7 +674,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.7.1"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.8.1"
             },
             "funding": [
                 {
@@ -682,20 +694,21 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-05T06:23:12+00:00"
+            "time": "2026-09-16T14:15:10+00:00",
+            "published-time": "2026-11-04T11:25:34+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.2",
+            "version": "v1.43.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6"
+                "reference": "122889ed24dc000165bcbfd77ec412f15cbdfc6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
-                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/122889ed24dc000165bcbfd77ec412f15cbdfc6a",
+                "reference": "122889ed24dc000165bcbfd77ec412f15cbdfc6a",
                 "shasum": ""
             },
             "require": {
@@ -747,7 +760,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.2"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.43.3"
             },
             "funding": [
                 {
@@ -767,20 +780,21 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-27T06:59:30+00:00"
+            "time": "2026-10-28T09:35:49+00:00",
+            "published-time": "2026-10-28T10:07:45+00:00"
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v7.4.17",
+            "version": "v7.4.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "53712df8727da1744490202eeb9cb50d4b95419d"
+                "reference": "6e6ff33ea8cf5df27f00a5561ebd5ee9bd7f1618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/53712df8727da1744490202eeb9cb50d4b95419d",
-                "reference": "53712df8727da1744490202eeb9cb50d4b95419d",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/6e6ff33ea8cf5df27f00a5561ebd5ee9bd7f1618",
+                "reference": "6e6ff33ea8cf5df27f00a5561ebd5ee9bd7f1618",
                 "shasum": ""
             },
             "require": {
@@ -834,7 +848,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v7.4.17"
+                "source": "https://github.com/symfony/var-dumper/tree/v7.4.22"
             },
             "funding": [
                 {
@@ -854,7 +868,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-21T12:09:28+00:00"
+            "time": "2026-10-25T21:04:04+00:00",
+            "published-time": "2026-10-28T18:20:00+00:00"
         },
         {
             "name": "topthink/think-dumper",
@@ -902,7 +917,8 @@
                 "issues": "https://github.com/top-think/think-dumper/issues",
                 "source": "https://github.com/top-think/think-dumper/tree/v1.0.7"
             },
-            "time": "2026-05-29T04:34:25+00:00"
+            "time": "2026-05-29T04:34:25+00:00",
+            "published-time": "2026-05-29T04:46:17+00:00"
         },
         {
             "name": "topthink/think-trace",
@@ -953,7 +969,8 @@
                 "issues": "https://github.com/top-think/think-trace/issues",
                 "source": "https://github.com/top-think/think-trace/tree/v2.0"
             },
-            "time": "2025-06-12T09:18:19+00:00"
+            "time": "2025-06-12T09:18:19+00:00",
+            "published-time": "2025-07-15T05:07:27+00:00"
         }
     ],
     "aliases": [],
@@ -965,5 +982,5 @@
         "php": ">=8.0.0"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }
