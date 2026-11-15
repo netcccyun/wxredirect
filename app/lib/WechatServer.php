@@ -174,11 +174,9 @@ class WechatServer
         $response = curl_exec($ch);
         if (curl_errno($ch) > 0) {
             $errmsg = curl_error($ch);
-            curl_close($ch);
             throw new Exception($errmsg);
         }
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
         if($httpCode >= 300){
             throw new Exception('httpCode='.$httpCode);
         }

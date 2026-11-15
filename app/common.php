@@ -41,7 +41,6 @@ function get_curl($url, $post=0, $referer=0, $cookie=0, $header=0, $ua=0, $nobod
 	curl_setopt($ch, CURLOPT_ENCODING, "gzip");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	$ret = curl_exec($ch);
-	curl_close($ch);
 	return $ret;
 }
 

@@ -59,7 +59,8 @@ class WechatCrypt
     private function dePKSC7($text)
     {
         $block_size = self::$block_size; //128:16、256:32
-        $pad = ord(substr($text, -1));
+        if ($text === '' || $text === false) return '';
+        $pad = ord($text[strlen($text) - 1]);
         if ($pad < 1 || $pad > $block_size) {
             $pad = 0;
         }
